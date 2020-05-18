@@ -25,4 +25,4 @@ The test and training data has been merged and following values have been calcul
 - Average of each measurement for each activity and each Subject
 
 
-### Please see the README.md for how the following instructions are implemented [README.md](****)
+### Please see the README.md for how the following instructions are implemented [README.md](https://github.com/yoann-pannetier/ProgrammingAssignment3)
