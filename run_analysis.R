@@ -27,7 +27,7 @@ mergedDataset <- rbind(train, test)
 
 # 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
-# 
+# create a new object containing standard deviation and mean for each measurement calles extractDataset
 
 
 extractDataset <- rbind(sapply(mergedDataset, mean) , sapply(mergedDataset, sd))
@@ -35,24 +35,38 @@ rownames(extractDataset) <- c("mean", "sd")
 
 
 # 3. Uses descriptive activity names to name the activities in the data set
-trainRefAct <- read.table(file.path(wd, "UCI HAR Dataset/train/Y_train.txt"), col.names = c("Activity"))
-testRefAct <- read.table(file.path(wd, "UCI HAR Dataset/test/Y_test.txt"), col.names = c("Activity"))
+
+# capture activities for each measurement out of the y_train and y_test files and convert them into
+# an activityNames object ready for use thank to the resolution kex activityLabels
+
+trainRefAct <- read.table(file.path(wd, "UCI HAR Dataset/train/Y_train.txt"), 
+                          col.names = c("Activity"))
+testRefAct <- read.table(file.path(wd, "UCI HAR Dataset/test/Y_test.txt"), 
+                         col.names = c("Activity"))
 activityRef <- rbind(trainRefAct, testRefAct)
 
-activityLabels <- read.table(file.path(wd, "UCI HAR Dataset/activity_labels.txt"), col.names = c("activityRef", "activityName"))
+activityLabels <- read.table(file.path(wd, "UCI HAR Dataset/activity_labels.txt"), 
+                             col.names = c("activityRef", "activityName"))
 
 activityNames <- merge(activityRef, activityLabels, by.x = "Activity", by.y = "activityRef", sort = FALSE)
 
 
-trainRefSubject <- read.table(file.path(wd, "UCI HAR Dataset/train/subject_train.txt"), col.names = c("SubjectNumber"))
-testRefSubject <- read.table(file.path(wd, "UCI HAR Dataset/test/subject_test.txt"), col.names = c("SubjectNumber"))
+trainRefSubject <- read.table(file.path(wd, "UCI HAR Dataset/train/subject_train.txt"), 
+                              col.names = c("SubjectNumber"))
+testRefSubject <- read.table(file.path(wd, "UCI HAR Dataset/test/subject_test.txt"), 
+                             col.names = c("SubjectNumber"))
 subjectRef <- rbind(trainRefSubject, testRefSubject)
 
 mergedDatasetLabels <- cbind(subjectRef, activityNames$activityName, mergedDataset)
 
 
 # 4. Appropriately labels the data set with descriptive variable names.
-features <- read.table(file.path(wd, "UCI HAR Dataset/features.txt"), col.names = c("featureRef", "featureName"))
+
+# extract the fatures list from the file features.txt and apply it to the two datasets
+# extractDataset and mergedDataset
+
+features <- read.table(file.path(wd, "UCI HAR Dataset/features.txt"), 
+                       col.names = c("featureRef", "featureName"))
 featureLabels <- as.character(t(features$featureName))
 colnames(extractDataset) <- featureLabels
 colnames(mergedDataset) <- featureLabels
@@ -60,11 +74,15 @@ colnames(mergedDataset) <- featureLabels
 mergedDatasetLabels <- cbind(subjectRef, activityNames$activityName, mergedDataset)
 
 
-# 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+# 5. From the data set in step 4, creates a second, 
+# independent tidy data set with the average of each variable for each activity and each subject.
+
+# apply the subject and activity key to the dataset and break it down to variables
+# depending on SubjectNumer and activityName using melt and dcast functions
 
 mergedDatasetNext <- cbind(subjectRef, activityNames$activityName, mergedDataset)
 mergedDatasetNext <- melt(mergedDatasetNext, id = c("SubjectNumber", "activityNames$activityName"))
-mergedDatasetNext <- dcast(mergedDatasetNext, SubjectNumber + activityNames$activityName ~ variable, fun.aggregate = mean)
+mergedDatasetNext <- dcast(mergedDatasetNext, SubjectNumber + activityNames$activityName ~ variable, 
+                           fun.aggregate = mean)
 
-export <- data.table(mergedDatasetNext)
-write.csv(export, file="TidyData.csv")
+write.csv(mergedDatasetNext, file="TidyData.csv")
