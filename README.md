@@ -8,7 +8,7 @@ The goal of the project is to demonstrate my availability to collect and prepare
 
 Item | Link to Item
 --- | ---
-GetCleanData_1.R |  [R Script Link](https://github.com/yoann-pannetier/ProgrammingAssignment3/blob/master/run_analysis.R "run_analysis.R")
+run_analysis.R |  [R Script Link](https://github.com/yoann-pannetier/ProgrammingAssignment3/blob/master/run_analysis.R "run_analysis.R")
 TidyData.csv |  [Data Set Link](https://github.com/yoann-pannetier/ProgrammingAssignment3/blob/master/TidyData.csv "TidyData.csv")
 CodeBook.md |  [Repo Link](https://github.com/yoann-pannetier/ProgrammingAssignment3/blob/master/CodeBook.md "CodeBook.md")
 
