@@ -27,18 +27,12 @@ mergedDataset <- rbind(train, test)
 
 # 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
-# create a new object containing standard deviation and mean for each measurement calles extractDataset
-
 
 extractDataset <- rbind(sapply(mergedDataset, mean) , sapply(mergedDataset, sd))
 rownames(extractDataset) <- c("mean", "sd")
 
 
 # 3. Uses descriptive activity names to name the activities in the data set
-
-# capture activities for each measurement out of the y_train and y_test files and convert them into
-# an activityNames object ready for use thank to the resolution kex activityLabels
-
 trainRefAct <- read.table(file.path(wd, "UCI HAR Dataset/train/Y_train.txt"), 
                           col.names = c("Activity"))
 testRefAct <- read.table(file.path(wd, "UCI HAR Dataset/test/Y_test.txt"), 
@@ -48,7 +42,8 @@ activityRef <- rbind(trainRefAct, testRefAct)
 activityLabels <- read.table(file.path(wd, "UCI HAR Dataset/activity_labels.txt"), 
                              col.names = c("activityRef", "activityName"))
 
-activityNames <- merge(activityRef, activityLabels, by.x = "Activity", by.y = "activityRef", sort = FALSE)
+activityNames <- merge(activityRef, activityLabels, by.x = "Activity", 
+                       by.y = "activityRef", sort = FALSE)
 
 
 trainRefSubject <- read.table(file.path(wd, "UCI HAR Dataset/train/subject_train.txt"), 
@@ -61,28 +56,26 @@ mergedDatasetLabels <- cbind(subjectRef, activityNames$activityName, mergedDatas
 
 
 # 4. Appropriately labels the data set with descriptive variable names.
-
-# extract the fatures list from the file features.txt and apply it to the two datasets
-# extractDataset and mergedDataset
-
 features <- read.table(file.path(wd, "UCI HAR Dataset/features.txt"), 
                        col.names = c("featureRef", "featureName"))
 featureLabels <- as.character(t(features$featureName))
-colnames(extractDataset) <- featureLabels
-colnames(mergedDataset) <- featureLabels
 
 mergedDatasetLabels <- cbind(subjectRef, activityNames$activityName, mergedDataset)
 
 
-# 5. From the data set in step 4, creates a second, 
-# independent tidy data set with the average of each variable for each activity and each subject.
+# 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
-# apply the subject and activity key to the dataset and break it down to variables
-# depending on SubjectNumer and activityName using melt and dcast functions
+activity <- activityNames$activityName
+mergedDatasetNext <- cbind(subjectRef, activity, mergedDataset)
 
-mergedDatasetNext <- cbind(subjectRef, activityNames$activityName, mergedDataset)
-mergedDatasetNext <- melt(mergedDatasetNext, id = c("SubjectNumber", "activityNames$activityName"))
-mergedDatasetNext <- dcast(mergedDatasetNext, SubjectNumber + activityNames$activityName ~ variable, 
-                           fun.aggregate = mean)
+mergedDatasetExport <- mergedDatasetNext %>%
+        group_by(SubjectNumber, activity) %>%
+        summarise_all(funs(mean)) %>%
+        ungroup()
 
-write.csv(mergedDatasetNext, file="TidyData.csv")
+
+colnames(extractDataset) <- featureLabels
+colnames(mergedDataset) <- featureLabels
+colnames(mergedDatasetExport) <- c("SubjectNumber", "activity", featureLabels)
+
+write.table(mergedDatasetExport, file="TidyData.txt", col.names = TRUE)
