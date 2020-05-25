@@ -78,4 +78,4 @@ colnames(extractDataset) <- featureLabels
 colnames(mergedDataset) <- featureLabels
 colnames(mergedDatasetExport) <- c("SubjectNumber", "activity", featureLabels)
 
-write.table(mergedDatasetExport, file="TidyData.txt", col.names = TRUE)
+write.table(mergedDatasetExport, file="TidyData.txt", col.names = TRUE, sep = "\t")
